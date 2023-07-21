@@ -1,20 +1,36 @@
-import React from "react";
-import { HighchartsWidget, HandsontableWidget } from "./widgets";
+import React, { useState } from "react";
 import {
-  Alert,
+  HighchartsWidget,
+  HandsontableWidget,
+  MaterialUITableWidget,
+} from "./widgets";
+import { DataSourceButton } from "./components";
+import {
   AppBar,
   Box,
-  Button,
   Container,
   Grid,
-  Link,
   Toolbar,
   Typography,
 } from "@mui/material";
-import * as dataSource from "./dataSources/versions.json";
-const { tableHeaders, tableData } = dataSource;
+import * as data from "./dataSources/versions.json";
+
+const availableDataSource = ["versions", "regions", "products"] as const;
+type AvailableDataSource = (typeof availableDataSource)[number];
 
 function App() {
+  const [dataSource, setDataSource] = useState(data);
+  const [dataSourceName, setDataSourceName] =
+    useState<AvailableDataSource>("versions");
+
+  const handleClick = async (dataSource: AvailableDataSource) => {
+    const rawData = await import(`./dataSources/${dataSource}.json`);
+    setDataSource(rawData);
+    setDataSourceName(dataSource);
+  };
+
+  const { tableHeaders, tableData } = dataSource;
+
   return (
     <Box className="App">
       <AppBar position="static">
@@ -35,15 +51,14 @@ function App() {
             >
               Data Source:
             </Typography>
-            <Button variant="contained" size="small">
-              Versions
-            </Button>
-            <Button size="small" disabled sx={{ margin: "0 15px" }}>
-              Products
-            </Button>
-            <Button size="small" disabled>
-              Regions
-            </Button>
+            {availableDataSource.map((dataSource) => (
+              <DataSourceButton
+                key={dataSource}
+                value={dataSource}
+                activeValue={dataSourceName}
+                onClick={handleClick}
+              />
+            ))}
           </Box>
         </Toolbar>
       </AppBar>
@@ -51,19 +66,17 @@ function App() {
         <Grid container spacing={3}>
           <Grid item lg={12}>
             <Typography variant="h5" sx={{ marginBottom: 1 }}>
+              MaterialUI Table Heatmap
+            </Typography>
+            <MaterialUITableWidget
+              tableHeaders={tableHeaders}
+              tableData={tableData}
+            />
+          </Grid>
+          <Grid item lg={12}>
+            <Typography variant="h5" sx={{ marginBottom: 1 }}>
               Highcharts Heatmap
             </Typography>
-            <Alert severity="warning">
-              Please modify the highcharts-widget so that it returns a heatmap
-              using &nbsp;
-              <Link
-                href="https://www.npmjs.com/package/highcharts"
-                target="_blank"
-              >
-                highcharts
-              </Link>
-              .
-            </Alert>
             <HighchartsWidget
               tableHeaders={tableHeaders}
               tableData={tableData}
@@ -73,17 +86,7 @@ function App() {
             <Typography variant="h5" sx={{ marginBottom: 1 }}>
               Handsontable Heatmap
             </Typography>
-            <Alert severity="warning">
-              Please modify the handsontable-widget so that it returns a heatmap
-              using &nbsp;
-              <Link
-                href="https://www.npmjs.com/package/handsontable"
-                target="_blank"
-                underline="hover"
-              >
-                handsontable
-              </Link>
-            </Alert>
+
             <HandsontableWidget
               tableHeaders={tableHeaders}
               tableData={tableData}
