@@ -55,7 +55,7 @@ function App() {
               <DataSourceButton
                 key={dataSource}
                 value={dataSource}
-                activeValue={dataSourceName}
+                isActive={dataSourceName === dataSource}
                 onClick={handleClick}
               />
             ))}

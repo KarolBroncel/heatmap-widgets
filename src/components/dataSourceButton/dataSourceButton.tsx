@@ -4,11 +4,11 @@ import { DataSourceButtonProps } from "./dataSourceButton.props";
 
 export const DataSourceButton = <T extends string>({
   value,
-  activeValue,
   onClick,
+  isActive = false,
 }: DataSourceButtonProps<T>) => (
   <Button
-    variant={activeValue === value ? "contained" : undefined}
+    variant={isActive ? "contained" : undefined}
     size="small"
     onClick={() => onClick(value)}
   >
